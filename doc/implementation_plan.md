@@ -1,4 +1,5 @@
 # Implementation Plan & Execution Roadmap
+
 ## Naukri.com Domain Support Agent (HR & Recruitment Track)
 
 ---
@@ -8,6 +9,7 @@
 This implementation plan translates the architectural specifications in [`doc/architecture.md`](file:///c:/Users/kastu/Desktop/capstone%20-%20hr/doc/architecture.md) and requirements in [`doc/problemStatement.md`](file:///c:/Users/kastu/Desktop/capstone%20-%20hr/doc/problemStatement.md) into a day-by-day, phase-by-phase execution roadmap.
 
 ### Core Implementation Principles
+
 1. **Deterministic Execution First:** Implement the `MOCK_LLM` engine and telemetry flags before wiring agents to eliminate flaky runs, external network dependencies, or API rate limits.
 2. **Mathematical Rigor & Empirical Evidence:** No hardcoded heuristic assumptions. Thresholds for RAG cosine similarity (T4) and application escalation (T6) are derived empirically from generated distributions.
 3. **Defense-in-Depth Governance:** Enforce Least Autonomy at the Python class/binding level, pre-execution prompt budgeting at the gateway, and input/output guardrails before and after model invocation.
@@ -54,6 +56,7 @@ gantt
 ## 3. Phase 1 — Dataset Design & RAG Core (Days 1–6)
 
 ### Day 1: Environment Baseline & Repository Scaffolding
+
 - **Objective:** Finalize workspace structure, directory tree, and environment sanity checks.
 - **Tasks:**
   1. Confirm dependencies in `.hr` environment (`pip check`).
@@ -62,6 +65,7 @@ gantt
 - **Verification:** Run `pytest` or folder check command; confirm clean directory layout.
 
 ### Day 2: Task T1 — Seeded Deterministic Dataset (`dataset.py`)
+
 - **Objective:** Generate reproducible synthetic applicant database matching Naukri scenario vocabulary.
 - **Implementation Specifications:**
   - Seed: `random.seed(42)` and `numpy.random.seed(42)`.
@@ -83,6 +87,7 @@ gantt
   - Transcript: Save output to `transcripts/t1_dataset_summary.txt`.
 
 ### Day 3: Task T2 — Curated Knowledge Base Authoring (`kb/`)
+
 - **Objective:** Create 12 distinct, high-quality, domain-specific policy documents in own words (2–5 sentences each).
 - **File Manifest:**
   1. `kb/01_eligibility.md`: Minimum educational degrees, career gaps allowance, and role qualification rules.
@@ -100,6 +105,7 @@ gantt
 - **Verification:** Script verifying that all 12 files exist, each has 2–5 sentences, and covers the topic thoroughly.
 
 ### Day 4: Task T3 — Dual Chunking Strategies & ChromaDB Indexing (`rag/`)
+
 - **Objective:** Implement two different chunking strategies and index into two isolated ChromaDB collections.
 - **Implementation Specifications:**
   - `rag/chunking.py`:
@@ -113,6 +119,7 @@ gantt
 - **Verification:** Run indexing script; query sample string (`"notice period buyout"`) across both collections to confirm retrieval. Save transcript to `transcripts/t3_indexing_sample.txt`.
 
 ### Day 5: Task T4 — Grounded Generation & Empirical Threshold Calibration (`rag/generate.py`)
+
 - **Objective:** Calibrate similarity threshold $T$ strictly based on empirical observations and implement grounded answer generation.
 - **Calibration Protocol:**
   - Measure cosine similarities for $\ge 3$ in-scope queries (e.g., notice buyout, BGV checks, probation tenure).
@@ -124,6 +131,7 @@ gantt
 - **Verification:** Demonstrate $\ge 5$ in-scope answers generated from context + 1 out-of-scope fallback triggering. Save results to `transcripts/t4_grounded_generation_demos.txt`.
 
 ### Day 6: Task T5 — Chunking Evaluation (Precision & Recall) (`rag/evaluate_chunking.py`)
+
 - **Objective:** Evaluate document-level precision and recall for both collections using deduplicated parent documents.
 - **Evaluation Arithmetic:**
   - Define benchmark test suite of $\ge 5$ diverse policy queries with known ground-truth parent documents.
@@ -140,17 +148,20 @@ gantt
 ## 4. Phase 2 — Orchestration, Memory & Guardrails (Days 7–9)
 
 ### Day 7: Deterministic `MOCK_LLM` & Task T6 Status Tool
+
 - **Objective:** Build the core `MOCK_LLM` engine and the applicant status lookup tool.
 - **Sub-task 1: `llm/mock_llm.py`:**
   - Extend `crewai.llms.base_llm.BaseLLM`.
   - **Resolve Pitfall A:** Parse newly generated token blocks; do not perform naive substring search for `"Observation:"`.
   - **Resolve Pitfall B:** Dispatch tool invocations using Pydantic argument schemas (`record_id` vs `query`), not tool name substrings.
   - Disable telemetry at import time:
+
     ```python
     import os
     os.environ["CREWAI_DISABLE_TELEMETRY"] = "true"
     os.environ["OTEL_SDK_DISABLED"] = "true"
     ```
+
 - **Sub-task 2: `crew/tools.py` (Task T6):**
   - Implement `check_job_application_status(record_id: str) -> dict`.
   - Escalation Formula:
@@ -160,6 +171,7 @@ gantt
 - **Verification:** Unit test tool on 5 sample record IDs; verify score computation and 80th percentile threshold cutoff. Save output to `transcripts/t6_status_tool_tests.txt`.
 
 ### Day 8: Task T7 — CrewAI Multi-Agent Team (`crew/agents.py`)
+
 - **Objective:** Assemble a 3-agent CrewAI crew driven by `MOCK_LLM`.
 - **Agent Definitions:**
   1. `RetrievalAgent`: Armed exclusively with `rag_lookup` tool.
@@ -173,6 +185,7 @@ gantt
   - Save full run logs to `transcripts/t7_crew_kickoff_transcripts.txt`.
 
 ### Day 9: Tasks T8, T9, T10 — Memory, Schemas & Guardrails
+
 - **Objective:** Implement session memory, Pydantic response formatting, and input/output guardrails.
 - **Sub-task 1: Session Memory (`crew/memory.py` - T8):**
   - LangChain `InMemoryChatMessageHistory` wrapped with `RunnableWithMessageHistory`.
@@ -192,6 +205,7 @@ gantt
 ## 5. Phase 3 — Observability, Evaluation & Deployment (Days 10–11)
 
 ### Day 10: Tasks T11 & T12 — FastAPI Deployment & Structured Logging
+
 - **Objective:** Deploy the agent behind an async FastAPI server with WebSocket support and PII-sanitized logging.
 - **Sub-task 1: FastAPI Server (`api/main.py` - T11):**
   - `POST /ask`: Primary synchronous query processing.
@@ -205,6 +219,7 @@ gantt
 - **Verification:** Run automated test client sending HTTP requests, WebSocket connection/disconnection test, and grep `audit_trail.jsonl` to verify no raw phone numbers exist. Save to `transcripts/t11_api_and_logging.txt`.
 
 ### Day 11: Task T13 — LLM-as-a-Judge 15-Query Evaluation Suite (`eval/judge.py`)
+
 - **Objective:** Run an automated, reproducible benchmark assessing system performance across 15 distinct scenarios.
 - **Benchmark Composition:**
   - 12 In-Scope Queries: Exactly 1 query per required KB topic (eligibility, interview scheduling, notice period, etc.).
@@ -222,6 +237,7 @@ gantt
 ## 6. Phase 4 — Resilience, Governance & Final Polish (Days 12–14)
 
 ### Day 12: Task T14 — Independent Autogen Review Stage (`review/autogen_review.py`)
+
 - **Objective:** Introduce an independent 2-agent Autogen peer-review stage before client delivery.
 - **Implementation Specifications:**
   - Chat Architecture: `RoundRobinGroupChat(max_turns=2)`.
@@ -229,6 +245,7 @@ gantt
     1. `PolicyComplianceReviewer`: Audits draft response against original retrieved KB context.
     2. `FinalEditor`: Resolves compliance notes and creates final output.
   - Structured Output: Emit `StructuredMessage[Verdict]` where `Verdict` is:
+
     ```python
     class Verdict(BaseModel):
         approved: bool
@@ -236,6 +253,7 @@ gantt
         final_answer: str
         reason: str
     ```
+
   - **Resolve Autogen Custom Message Invariant:**
     Register `custom_message_types=[StructuredMessage[Verdict]]` on the Team to prevent runtime `ValueError`.
 - **Demos Required:**
@@ -244,6 +262,7 @@ gantt
 - **Verification:** Run both review flows; capture transcripts with structured verdict objects in `transcripts/t14_autogen_review.txt`.
 
 ### Day 13: Tasks T15 & T16 — Governance Policies & In-Memory Cache
+
 - **Objective:** Implement Least Autonomy validation, AI Risk classification, runtime budget cap, and deterministic query caching.
 - **Sub-task 1: Governance Controls (`governance/` - T15):**
   - `least_autonomy.py`: Test attempting to invoke `check_job_application_status` from `RetrievalAgent` or `ResponseComposer`, asserting security rejection.
@@ -257,6 +276,7 @@ gantt
 - **Verification:** Execute oversized request showing budget refusal; run repeated query showing $O(1)$ sub-millisecond cache hit. Save to `transcripts/t15_governance_and_cache.txt`.
 
 ### Day 14: End-to-End Clean Run, Documentation Polish & Public Release
+
 - **Objective:** Execute full regression suite from clean state, complete all README requirements, and verify submission criteria.
 - **Checklist:**
   1. Top line of `doc/README.md` declares: `Naukri.com (Recruitment & HR) Track`.
