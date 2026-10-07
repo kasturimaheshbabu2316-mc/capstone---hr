@@ -24,6 +24,7 @@
 ## 2. Part 1: Dataset Design & RAG Core (30 Marks)
 
 ### Task T1: Deterministic Seeded Dataset Generation
+
 - **Target File:** `dataset.py`
 - **Schedule:** Day 2
 - **Mark Weight:** 6 Marks
@@ -39,6 +40,7 @@
   - Transcript: `transcripts/t1_dataset_summary.txt`.
 
 ### Task T2: Knowledge Base Document Authoring
+
 - **Target Directory:** `kb/`
 - **Schedule:** Day 3
 - **Mark Weight:** 6 Marks
@@ -61,6 +63,7 @@
   - Transcript: `transcripts/t2_kb_manifest.txt`.
 
 ### Task T3: Dual Chunking Strategies & Vector Indexing
+
 - **Target Files:** `rag/chunking.py`, `rag/indexing.py`
 - **Schedule:** Day 4
 - **Mark Weight:** 6 Marks
@@ -74,6 +77,7 @@
   - Transcript: `transcripts/t3_indexing_sample.txt`.
 
 ### Task T4: Grounded Generation & Empirical Threshold Calibration
+
 - **Target File:** `rag/generate.py`
 - **Schedule:** Day 5
 - **Mark Weight:** 6 Marks
@@ -87,6 +91,7 @@
   - Transcript: `transcripts/t4_grounded_generation_demos.txt`.
 
 ### Task T5: Chunking Strategy Precision & Recall Evaluation
+
 - **Target File:** `rag/evaluate_chunking.py`
 - **Schedule:** Day 6
 - **Mark Weight:** 6 Marks
@@ -104,6 +109,7 @@
 ## 3. Part 2: CrewAI Orchestration, Memory & Guardrails (30 Marks)
 
 ### Task T6: Application Status Tool & Escalation Formula
+
 - **Target File:** `crew/tools.py`
 - **Schedule:** Day 7
 - **Mark Weight:** 6 Marks
@@ -117,6 +123,7 @@
   - Transcript: `transcripts/t6_status_tool_tests.txt`.
 
 ### Task T7: CrewAI Multi-Agent Team Kickoff
+
 - **Target Files:** `llm/mock_llm.py`, `crew/agents.py`
 - **Schedule:** Day 8
 - **Mark Weight:** 6 Marks
@@ -129,6 +136,7 @@
   - Transcript: `transcripts/t7_crew_kickoff_transcripts.txt`.
 
 ### Task T8: Multi-Turn Conversational Memory
+
 - **Target File:** `crew/memory.py`
 - **Schedule:** Day 9
 - **Mark Weight:** 6 Marks
@@ -141,6 +149,7 @@
   - Transcript: `transcripts/t8_memory_sessions.txt`.
 
 ### Task T9: Structured Response Format Validation
+
 - **Target File:** `crew/schemas.py`
 - **Schedule:** Day 9
 - **Mark Weight:** 6 Marks
@@ -152,6 +161,7 @@
   - Transcript: `transcripts/t9_schema_validation.txt`.
 
 ### Task T10: Triple Guardrails Engine (Input & Output)
+
 - **Target File:** `crew/guardrails.py`
 - **Schedule:** Day 9
 - **Mark Weight:** 6 Marks
@@ -168,6 +178,7 @@
 ## 4. Part 3: Observability, Evaluation & Deployment (20 Marks)
 
 ### Task T11: FastAPI Transport (HTTP & WebSocket)
+
 - **Target File:** `api/main.py`
 - **Schedule:** Day 10
 - **Mark Weight:** 7 Marks
@@ -180,6 +191,7 @@
   - Transcript: `transcripts/t11_api_and_logging.txt`.
 
 ### Task T12: Structured JSON-Lines Audit Logging
+
 - **Target File:** `api/logging_utils.py`
 - **Schedule:** Day 10
 - **Mark Weight:** 6 Marks
@@ -192,6 +204,7 @@
   - Transcript: `transcripts/t11_api_and_logging.txt`.
 
 ### Task T13: LLM-as-a-Judge 15-Query Evaluation Suite
+
 - **Target File:** `eval/judge.py`
 - **Schedule:** Day 11
 - **Mark Weight:** 7 Marks
@@ -208,6 +221,7 @@
 ## 5. Part 4: Resilience & Governance (20 Marks)
 
 ### Task T14: Independent Autogen Peer-Review Stage
+
 - **Target File:** `review/autogen_review.py`
 - **Schedule:** Day 12
 - **Mark Weight:** 7 Marks
@@ -222,6 +236,7 @@
   - Transcript: `transcripts/t14_autogen_review.txt`.
 
 ### Task T15: AI Governance & Token Budget Cap
+
 - **Target Files:** `governance/least_autonomy.py`, `governance/budget.py`, `doc/RISK.md`
 - **Schedule:** Day 13
 - **Mark Weight:** 7 Marks
@@ -234,6 +249,7 @@
   - Transcript: `transcripts/t15_governance_and_cache.txt`.
 
 ### Task T16: In-Memory Deterministic Query Caching
+
 - **Target File:** `cache.py`
 - **Schedule:** Day 13
 - **Mark Weight:** 6 Marks
