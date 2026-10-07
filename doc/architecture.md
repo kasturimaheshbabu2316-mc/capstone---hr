@@ -1,4 +1,5 @@
 # System Architecture & Technical Specification
+
 ## Naukri.com Domain Support Agent (HR & Recruitment Track)
 
 ---
@@ -6,10 +7,12 @@
 ## 1. Executive Summary & Architectural Scope
 
 The **Naukri.com Domain Support Agent** is an enterprise-grade, deterministic, multi-agent AI system designed for Naukri.com's employer-support operations. It fulfills two primary business workflows:
+
 1. **Hiring-Policy Consultation:** Answering recruitment and HR policy questions using an internal, curated Knowledge Base (12 distinct policy documents) with empirically calibrated retrieval-augmented generation (RAG).
 2. **Application Status Inquiries:** Querying and evaluating the lifecycle status of candidate job applications from a deterministic dataset, augmented with an empirical escalation score.
 
 ### Key Operational Invariants & Constraints
+
 - **100% Deterministic & Offline:** Runs exclusively under a custom `MOCK_LLM` extending `crewai.llms.base_llm.BaseLLM`. Zero external API keys, zero network socket calls, and zero external telemetry (`CREWAI_DISABLE_TELEMETRY=true`).
 - **Separation of Concerns:** Multi-agent orchestration handled via **CrewAI** (3 specialized agents), followed by an independent post-generation peer review stage handled via **Autogen** (2-agent group chat).
 - **Strict AI Governance:** Explicit Least Autonomy tool binding, High-Risk classification under recruitment guidelines, and a per-request budget cap.
@@ -127,11 +130,13 @@ flowchart TD
 ### 3.1 Ingestion & Transport Layer (`api/`)
 
 #### 3.1.1 HTTP Service (`api/main.py`)
+
 - **Endpoints:**
   - `POST /ask`: Primary synchronous query endpoint. Accepts `AskRequest`, coordinates guardrails, caching, CrewAI orchestration, Autogen review, and returns validated `AskResponse`.
   - `POST /add-document`: Knowledge Base expansion endpoint. Accepts `DocumentUploadRequest`, chunks content with both strategies, and updates both ChromaDB collections via `upsert()`.
   - `GET /health`: Liveness and readiness probe reporting mock LLM status, ChromaDB collection counts, and memory cache stats.
 - **Contract Models (Pydantic):**
+
   ```python
   class AskRequest(BaseModel):
       query: str = Field(..., min_length=2, max_length=1000)
@@ -149,6 +154,7 @@ flowchart TD
   ```
 
 #### 3.1.2 WebSocket Service (`api/main.py`)
+
 - **Route:** `@app.websocket("/ws/chat")`
 - **Session Lifecycle & Fault Resilience:**
   - Manages client connection pools with thread-safe connection tracking.
@@ -156,9 +162,11 @@ flowchart TD
   - On sudden disconnection, logs the mid-conversation termination with `trace_id` and cleanly purges socket resources without impacting concurrent connections or crashing the worker process.
 
 #### 3.1.3 Structured Logging & Observability (`api/logging_utils.py`)
+
 - Emits **one JSON-Lines record per request** directly to an append-only log file (`logs/audit_trail.jsonl`).
 - **Mandatory Privacy Invariant:** Raw phone numbers must NEVER touch persistent storage. The identical PII masking pipeline used for model inputs is applied to queries, retrieved chunks, and drafted answers before log generation.
 - **Log Schema:**
+
   ```json
   {
     "trace_id": "c1f7a4b0-3982-4f11-9a7e-12849b6d8142",
@@ -180,11 +188,13 @@ flowchart TD
 ### 3.2 Governance, Budgeting & Caching (`governance/`, `cache.py`)
 
 #### 3.2.1 Runtime Layer: Per-Request Budget Cap (`governance/budget.py`)
+
 - **Token Estimation Formula:** $E_{tokens} = \lceil \text{length}(query) / 4 \rceil + \text{max\_context\_tokens}$.
 - **Ceiling:** Hard ceiling set at **250 prompt tokens** per request.
 - **Enforcement:** Executed as the very first gateway filter. If $E_{tokens} > 250$, execution halts immediately, returning an HTTP 429 response with an explicit governance rejection message: `"Request rejected: Query exceeds governance budget cap of 250 tokens."`
 
 #### 3.2.2 Application Layer: Least Autonomy Principle (`governance/least_autonomy.py`)
+
 - **Role-Based Tool Binding Policy:**
   - `RetrievalAgent` is provisioned exclusively with `rag_lookup(query)`.
   - `LookupAgent` is provisioned exclusively with `check_job_application_status(record_id)`.
@@ -192,12 +202,14 @@ flowchart TD
 - **Architectural Safeguard:** A centralized `ToolAccessController` enforces that if an agent attempts to execute an unmapped tool (or if an agent definition illegally wires the tool), an execution exception (`SecurityGovernanceError`) is raised.
 
 #### 3.2.3 AI Risk Classification (`governance/RISK.md`)
+
 - **Classification:** **HIGH RISK** (under EU AI Act Annex III, Section 4: *Employment, workers management and access to self-employment*).
 - **Justification:** The agent processes sensitive candidate application lifecycles, salary expectations, and computes automated escalation scores that determine human HR priority handling. Uncontrolled hallucination or unauthorized status exposure directly impacts employment fairness and data privacy.
 
 #### 3.2.4 In-Memory Deterministic Query Caching (`cache.py`)
+
 - **Scope:** Keyed strictly for grounded KB queries (status lookups bypass cache to preserve real-time status reflection).
-- **Key Generation:** 
+- **Key Generation:**
   $$\text{Key} = \text{SHA256}(\text{normalize}(\text{query}))$$
   where $\text{normalize}(q)$ lowercases, strips punctuation, and standardizes whitespace.
 - **Evidence Interface:** Provides atomic call counters (`cache_hits`, `cache_misses`) and timing benchmarks demonstrating $O(1)$ sub-millisecond retrieval on repeat queries.
@@ -219,11 +231,13 @@ flowchart LR
 ```
 
 #### 3.3.1 PII Masking Engine
+
 - **Target Specification:** Indian standard phone numbers (fixed formats: `+91-XXXXXXXXXX`, `+91 XXXXXXXXXX`, `0XXXXXXXXXX`, `XXXXXXXXXX` 10-digit formats).
 - **Replacement:** Tokenized as `[REDACTED_PHONE]`.
 - **Out-of-Scope Demarcation:** In accordance with problem specifications, applicant names, expected salary numbers, and background verification outcomes are not masked (fabricated synthetic entries are utilized).
 
 #### 3.3.2 Prompt Injection Detection Engine
+
 - Inspects input queries against deterministic injection taxonomy:
   - System prompt overrides (`"Ignore previous instructions"`, `"System prompt override"`, `"You are now DAN"`).
   - Delimiter escape exploits (`"---END SYSTEM---"`, `"```system"`).
@@ -231,6 +245,7 @@ flowchart LR
 - Action: Bypasses model invocation, logs an alert event, and returns a sanitized refusal.
 
 #### 3.3.3 Output Groundedness Guard
+
 - Cross-references draft assertions against retrieved KB contexts using token overlap and claim boundary matching.
 - In the event of an ungrounded inference or a cosine similarity below the calibrated threshold, replaces response with canonical fallback: `"I apologize, but this topic is not covered in our recruitment policy knowledge base."`
 
@@ -239,6 +254,7 @@ flowchart LR
 ### 3.4 Data & Knowledge Subsystem (`dataset.py`, `kb/`, `rag/`)
 
 #### 3.4.1 Deterministic Application Dataset (`dataset.py`)
+
 - **Records:** $N \ge 40$ (seeded with `random.seed(42)`).
 - **Schema:**
   - `record_id`: Formatted string `APP-XXXXX`.
@@ -251,6 +267,7 @@ flowchart LR
 - **Salary Range Rationale:** ₹3L–₹30L reflects standard Indian industry salary compensation bands from entry-level Sales Associates/HR Executives up to senior Software Engineers/Product Managers.
 
 #### 3.4.2 Knowledge Base (`kb/`)
+
 - Exactly 12 standalone documents (`.txt` or `.md`), each comprising 2 to 5 carefully crafted, domain-specific sentences covering:
   1. `01_eligibility.md`: Job-application eligibility criteria.
   2. `02_interview_scheduling.md`: Interview-scheduling process and timelines.
@@ -266,6 +283,7 @@ flowchart LR
   12. `12_data_retention.md`: Applicant data retention and GDPR/DPDP compliance.
 
 #### 3.4.3 Dual-Collection RAG Architecture (`rag/`)
+
 - **Strategy A (`kb_fixed_overlap`):** Fixed chunk size of 200 characters with a 40-character sliding overlap.
 - **Strategy B (`kb_sentence_based`):** Syntactic sentence tokenizer (splitting on sentence boundaries).
 - **Embeddings:** Local, free SentenceTransformers model (`sentence-transformers/all-MiniLM-L6-v2`), cached locally for complete offline operation.
@@ -289,6 +307,7 @@ flowchart TD
 ```
 
 #### 3.4.4 Empirical Similarity Calibration (`rag/generate.py`)
+
 - To prevent arbitrary preset thresholds (e.g. 0.5/0.6), the system executes an empirical calibration:
   - Cosine similarities measured for $\ge 3$ in-scope benchmark queries: $S_{in} = \{s_1, s_2, s_3\}$.
   - Cosine similarities measured for $\ge 2$ out-of-scope benchmark queries: $S_{out} = \{s_4, s_5\}$.
@@ -297,6 +316,7 @@ flowchart TD
   - Queries with top-1 similarity $< T$ deterministically trigger the canonical "out-of-scope" fallback response.
 
 #### 3.4.5 Chunking Strategy Evaluation (`rag/evaluate_chunking.py`)
+
 - Evaluates both collections across identical queries using document-level metrics:
   $$\text{Precision} = \frac{|\text{Retrieved Parent Docs} \cap \text{Relevant Docs}|}{|\text{Retrieved Parent Docs}|}$$
   $$\text{Recall} = \frac{|\text{Retrieved Parent Docs} \cap \text{Relevant Docs}|}{|\text{Relevant Docs}|}$$
@@ -326,6 +346,7 @@ flowchart TD
 ```
 
 #### 3.5.1 Agent Definitions (`crew/agents.py`)
+
 1. **Retrieval Agent:**
    - **Role:** Policy Knowledge Retrieval Specialist.
    - **Goal:** Extract grounded, authoritative policy excerpts from the vector database for recruitment queries.
@@ -343,8 +364,10 @@ flowchart TD
    - **Tools:** None (least autonomy).
 
 #### 3.5.2 Application Status Tool & Escalation Formula (`crew/tools.py`)
+
 - **Tool Signature:** `check_job_application_status(record_id: str) -> dict`
 - **Output Schema:**
+
   ```python
   class StatusToolResponse(BaseModel):
       record_id: str
@@ -354,6 +377,7 @@ flowchart TD
       escalation_triggered: bool
       reasoning: str
   ```
+
 - **Escalation Score Mathematical Formula:**
   $$S_{esc} = 0.5 \cdot (\mathbf{1}_{\text{flagged\_priority\_review}}) + 0.5 \cdot \left(\frac{\text{days\_since\_created}}{30}\right)$$
 - **Escalation Cutoff Justification:**
@@ -361,6 +385,7 @@ flowchart TD
   - If $S_{esc} \ge \tau_{esc}$, `escalation_triggered = True`, instructing the Response Composer to attach an urgent HR review alert.
 
 #### 3.5.3 Session Memory Architecture (`crew/memory.py`)
+
 - Integrated using LangChain's `InMemoryChatMessageHistory` with `RunnableWithMessageHistory`.
 - Isolates conversations via explicit `session_id`.
 - Verified via two separate transcripts:
@@ -369,7 +394,9 @@ flowchart TD
 - *Note on LangChain deprecation warning:* Handled as an expected ecosystem message and documented without silencing.
 
 #### 3.5.4 Structured Output Enforcement (`crew/schemas.py`)
+
 - Every crew response validates against `SupportResponse`:
+
   ```python
   class SupportResponse(BaseModel):
       query_type: Literal["policy", "status", "out_of_scope"]
@@ -401,12 +428,14 @@ sequenceDiagram
 ```
 
 #### 3.6.1 Agent Topology (`review/autogen_review.py`)
+
 - **Chat Strategy:** `RoundRobinGroupChat` configured with `max_turns=2`.
 - **Agents:**
   1. `PolicyComplianceReviewer`: Verifies that every assertion in the draft is strictly grounded in the retrieved KB context and complies with Naukri recruitment policy.
   2. `FinalEditor`: Reviews compliance remarks, applies corrections if ungrounded claims are present, and outputs the final structured message.
 - **Structured Output Protocol:**
   - `FinalEditor` emits `StructuredMessage[Verdict]`:
+
     ```python
     class Verdict(BaseModel):
         approved: bool
@@ -414,6 +443,7 @@ sequenceDiagram
         final_answer: str
         reason: str
     ```
+
 - **Autogen Type Registration Invariant:**
   - To prevent runtime `ValueError: Message type ... is not registered`, the team explicitly registers:
     `custom_message_types=[StructuredMessage[Verdict]]`.
@@ -444,9 +474,11 @@ flowchart TD
 ```
 
 #### 3.7.1 Subclassing & Implementation
+
 - Inherits from `crewai.llms.base_llm.BaseLLM`.
 - Implements `call(messages, ...)` and generation methods required by CrewAI and Autogen.
 - Pre-import initialization guarantees telemetry suppression:
+
   ```python
   import os
   os.environ["CREWAI_DISABLE_TELEMETRY"] = "true"
@@ -454,10 +486,12 @@ flowchart TD
   ```
 
 #### 3.7.2 Pitfall A Resolution (ReAct Parser Safety)
+
 - **Vulnerability:** CrewAI's default ReAct prompt contains the literal string `"Observation: the result of the action"`. Naive substring search on raw conversation history triggers false ReAct terminations.
 - **Architectural Resolution:** The parser isolates the newly generated output token stream and parses strictly within model-generated boundary blocks, never searching across full prompt history.
 
 #### 3.7.3 Pitfall B Resolution (Schema-Based Tool Dispatch)
+
 - **Vulnerability:** Matching tools by name substrings causes collisions (e.g. `rag_lookup` contains `lookup`).
 - **Architectural Resolution:** The mock dispatcher matches agent tool calls against the tool's declared Pydantic **argument schema** (e.g. presence of `record_id: str` vs `query: str`), guaranteeing unambiguous dispatch.
 
@@ -484,7 +518,7 @@ flowchart TD
 
 The physical codebase conforms to the specified file structure:
 
-```
+```text
 naukri-support-agent/
 ├── README.md                  # Track, design choices, thresholds, telemetry flags, runbook
 ├── problemStatement.md        # Original problem specifications

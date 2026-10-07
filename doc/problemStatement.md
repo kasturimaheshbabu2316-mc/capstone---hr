@@ -111,7 +111,7 @@ Goal: build it to the standard of a real production governance review, not a hap
 
 ## 5. Acceptance Criteria Checklist
 
-**Part 1**
+### Part 1
 
 - [ ] `dataset.py` ≥40 records; category ≥3 each; status ≥1 each; flagged % in 10–30%; choices in README
 - [ ] ≥12 KB docs covering all required topics
@@ -119,7 +119,7 @@ Goal: build it to the standard of a real production governance review, not a hap
 - [ ] ≥5 in-scope grounded answers + 1 out-of-scope fallback
 - [ ] Precision/recall for both collections, per-query arithmetic, numbers-cited recommendation
 
-**Part 2**
+### Part 2
 
 - [ ] Status tool with designed, justified `escalation_score`
 - [ ] Crew ≥3 agents; both tools invoked on different queries via `.kickoff()`
@@ -127,19 +127,19 @@ Goal: build it to the standard of a real production governance review, not a hap
 - [ ] Every response validates against Pydantic schema
 - [ ] PII, injection, and groundedness guardrails each demonstrated firing
 
-**Part 3**
+### Part 3
 
 - [ ] ≥2 HTTP endpoints + 1 WebSocket surviving disconnect
 - [ ] JSON-Lines log with trace ID per request, PII masked
 - [ ] 15-query eval with 4 scores each + 4 averages
 
-**Part 4**
+### Part 4
 
 - [ ] Autogen: approve-unchanged and revise demos with structured verdicts
 - [ ] Least autonomy demonstrated; risk classification justified; budget cap rejects oversized request
 - [ ] Cache hit with before/after evidence
 
-**Global**
+### Global
 
 - [ ] README top line: Naukri.com (Recruitment & HR) track
 - [ ] README confirms `MOCK_LLM`, zero API keys, and `CREWAI_DISABLE_TELEMETRY=true`
@@ -149,7 +149,7 @@ Goal: build it to the standard of a real production governance review, not a hap
 
 ## 6. Proposed Repository Structure
 
-```
+```text
 naukri-support-agent/
 ├── README.md                  # track, dataset choices, thresholds, telemetry note, how to run
 ├── problemStatement.md
