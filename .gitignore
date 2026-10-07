@@ -1,0 +1,44 @@
+# Virtual Environments
+.hr/
+.venv/
+env/
+venv/
+ENV/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Vector store & local databases
+chroma_data/
+*.chroma
+*.db
+*.sqlite3
+
+# Logs & temporary runtimes
+logs/
+*.log
+audit_trail.jsonl
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Pytest / Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo

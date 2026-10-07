@@ -1,0 +1,51 @@
+# ==============================================================================
+# Naukri.com Domain Support Agent (Recruitment & HR) - Requirements
+# Track: Recruitment & HR (Naukri.com)
+# Runtime: 100% Deterministic MOCK_LLM - Zero external API keys, zero network calls
+# ==============================================================================
+
+# --- Multi-Agent Orchestration Frameworks ---
+# Primary agentic crew (Retrieval, Lookup, Response Composer)
+crewai>=0.80.0
+
+# Independent secondary review team (RoundRobinGroupChat, StructuredMessage[Verdict])
+autogen-agentchat>=0.4.0
+autogen-core>=0.4.0
+autogen-ext>=0.4.0
+
+# --- Conversation Memory & Pipeline ---
+# Multi-turn session state management (InMemoryChatMessageHistory, RunnableWithMessageHistory)
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+
+# --- Vector Store & Embeddings (Local / Free Stack) ---
+# Local embedding generation (offline all-MiniLM-L6-v2)
+sentence-transformers>=3.0.0
+
+# Vector database for dual chunking collections (fixed-overlap & sentence-based)
+chromadb>=0.5.0
+
+# --- Web Framework & Transport Layer ---
+# High-performance async API (HTTP POST /ask, POST /add-document)
+fastapi>=0.115.0
+
+# Production ASGI server with WebSocket support
+uvicorn[standard]>=0.32.0
+
+# Real-time streaming WebSocket protocol handler
+websockets>=13.0
+
+# --- Data Validation & Numerics ---
+# Strict contract enforcement for tools, responses, verdicts, and API models
+pydantic>=2.9.0
+
+# Numerical computations (escalation score distributions, cosine similarity calibration)
+numpy>=1.26.0
+
+# --- Testing, Benchmarking & HTTP Clients ---
+# Test suite execution for unit & guardrail test cases
+pytest>=8.3.0
+
+# Async test client for FastAPI HTTP and WebSocket testing
+httpx>=0.27.0
