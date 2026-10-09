@@ -1,0 +1,27 @@
+======================================================================
+LANGCHAIN MULTI-TURN CONVERSATIONAL MEMORY VERIFICATION (TASK T8)
+======================================================================
+Framework: LangChain RunnableWithMessageHistory + InMemoryChatMessageHistory
+Note: LangChainDeprecationWarning is expected and preserved per Constraint #9.
+
+--- TRANSCRIPT 1: MULTI-TURN SESSION WITH PRONOUN RESOLUTION ---
+Session ID: sess-recruiter-alpha-101
+
+[Turn 1]
+User Query : Please check the status for applicant APP-00012.
+Agent Reply: Candidate application APP-00012 is in 'Screening' status with expected salary ₹540,000. Escalation risk score is 0.3333 (Escalation Triggered: False). Application has been open for 20 days (20/30 elapsed). Escalation score 0.3333 is within standard threshold (0.4500).
+
+[Turn 2 - Follow-Up with Anaphora]
+User Query : What was their expected salary and are they flagged for priority review?
+Agent Reply: Candidate APP-00012 has an expected salary of ₹540,000. The application is not flagged for priority review with an escalation score of 0.3333 (within standard threshold).
+Verification: Pronoun 'their' successfully resolved to APP-00012 from Turn 1.
+
+======================================================================
+--- TRANSCRIPT 2: SEPARATE FRESH SESSION (ZERO CONTEXT BLEEDING) ---
+Session ID: sess-recruiter-beta-202 (Fresh Isolated Session)
+
+[Fresh Session Turn 1]
+User Query : What was their expected salary and are they flagged for priority review?
+Agent Reply: I could not identify which candidate you are referring to. Please specify the application record ID (e.g. APP-00012).
+Verification: Isolated session has zero access to Session 1 history (no memory bleeding).
+======================================================================

@@ -1,0 +1,20 @@
+======================================================================
+NAUKRI.COM KNOWLEDGE BASE MANIFEST (TASK T2)
+======================================================================
+Total KB Documents: 12 (Requirement: 12)
+
+Filename                       | Topic                            | Sentences | Status
+-------------------------------------------------------------------------------------
+01_eligibility.md              | Job-Application Eligibility Crit |         3 | VALID (2-5)
+02_interview_scheduling.md     | Interview-Scheduling Process     |         3 | VALID (2-5)
+03_offer_negotiation.md        | Offer-Negotiation Policy         |         3 | VALID (2-5)
+04_background_verification.md  | Background-Verification Process  |         3 | VALID (2-5)
+05_notice_period.md            | Notice-Period Policy             |         3 | VALID (2-5)
+06_referral_bonus.md           | Referral-Bonus Policy            |         3 | VALID (2-5)
+07_internal_transfer.md        | Internal-Transfer Eligibility    |         3 | VALID (2-5)
+08_probation_period.md         | Probation-Period Policy          |         3 | VALID (2-5)
+09_remote_work.md              | Remote-Work Eligibility          |         3 | VALID (2-5)
+10_diversity_hiring.md         | Diversity-Hiring Guidelines      |         3 | VALID (2-5)
+11_exit_interview.md           | Exit-Interview Process           |         3 | VALID (2-5)
+12_data_retention.md           | Applicant-Data-Retention Policy  |         3 | VALID (2-5)
+======================================================================

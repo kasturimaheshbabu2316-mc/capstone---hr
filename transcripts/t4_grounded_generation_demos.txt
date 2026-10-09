@@ -1,0 +1,65 @@
+======================================================================
+EMPIRICAL SIMILARITY CALIBRATION & GROUNDED GENERATION (TASK T4)
+======================================================================
+Target Collection: kb_sentence_based
+
+--- EMPIRICAL CALIBRATION MEASUREMENTS ---
+In-Scope Benchmark Queries (S_in):
+  - Sim: 0.6763 | Parent: 05_notice_period.md        | Query: 'What is the policy regarding notice period buyout and early release?'
+  - Sim: 0.5939 | Parent: 04_background_verification.md | Query: 'How does the employee background verification process work?'
+  - Sim: 0.4826 | Parent: 07_internal_transfer.md    | Query: 'What are the eligibility criteria and tenure requirements for internal transfer?'
+  - Sim: 0.7348 | Parent: 08_probation_period.md     | Query: 'Can you explain the probation period review timeline and confirmation?'
+  - Sim: 0.5946 | Parent: 09_remote_work.md          | Query: 'What are the rules and approvals required for remote or hybrid work?'
+  => Minimum In-Scope Similarity  : 0.4826
+
+Out-of-Scope Benchmark Queries (S_out):
+  - Sim: 0.1926 | Parent: 02_interview_scheduling.md | Query: 'What is the lunch menu in the corporate Bangalore office cafeteria?'
+  - Sim: 0.3570 | Parent: 03_offer_negotiation.md    | Query: 'Can employees purchase company stock options and equity grants?'
+  - Sim: 0.2914 | Parent: 05_notice_period.md        | Query: 'What is the corporate travel reimbursement per diem allowance?'
+  => Maximum Out-of-Scope Similarity: 0.3570
+
+CALIBRATED THRESHOLD FORMULA : T = (min(S_in) + max(S_out)) / 2
+                              T = (0.4826 + 0.3570) / 2
+                              T = 0.4198
+VERIFICATION: Cutoff mathematically separates observed in-scope and out-of-scope clusters.
+
+======================================================================
+--- DEMONSTRATION: >= 5 IN-SCOPE GROUNDED ANSWERS ---
+
+[DEMO 1: IN-SCOPE]
+Query          : What are the academic degree requirements and gap allowances for candidates?
+Top Similarity : 0.5069 (Threshold: 0.4198 -> PASS)
+Citations      : ['01_eligibility.md']
+Grounded Answer: According to Naukri.com Job-Application Eligibility Criteria: Candidates must meet at least eighty percent of mandatory technical or domain skills specified in the job description to qualify for technical evaluation. Additionally, Candidates applying for open roles on Naukri.com must possess a recognized degree relevant to the position or equivalent professional experience.
+
+[DEMO 2: IN-SCOPE]
+Query          : How many rescheduling attempts are allowed for candidate interviews?
+Top Similarity : 0.7543 (Threshold: 0.4198 -> PASS)
+Citations      : ['02_interview_scheduling.md', '03_offer_negotiation.md']
+Grounded Answer: According to Naukri.com Interview-Scheduling Process: Candidates are permitted a maximum of two rescheduling requests provided notice is given at least twelve hours prior to the slot. Additionally, All candidate interview rounds must be scheduled through the enterprise recruiting portal with at least forty-eight hours advance notice.
+
+[DEMO 3: IN-SCOPE]
+Query          : What is the maximum salary deviation requiring VP and compensation approval?
+Top Similarity : 0.5264 (Threshold: 0.4198 -> PASS)
+Citations      : ['03_offer_negotiation.md']
+Grounded Answer: According to Naukri.com Offer-Negotiation Policy: Any proposed salary compensation exceeding fifteen percent above the approved role band requires formal approval from the business unit head and compensation committee.
+
+[DEMO 4: IN-SCOPE]
+Query          : What are the payout milestones and tenure for employee referral bonuses?
+Top Similarity : 0.7252 (Threshold: 0.4198 -> PASS)
+Citations      : ['05_notice_period.md', '06_referral_bonus.md']
+Grounded Answer: According to Naukri.com Referral-Bonus Policy: Referral bonuses range from twenty-five thousand to seventy-five thousand INR depending on role seniority and technical specialization. Additionally, Current employees are eligible for a referral bonus when a recommended candidate completes ninety days of continuous employment.
+
+[DEMO 5: IN-SCOPE]
+Query          : What affirmative action directives are in place for leadership interview panels?
+Top Similarity : 0.5643 (Threshold: 0.4198 -> PASS)
+Citations      : ['10_diversity_hiring.md']
+Grounded Answer: According to Naukri.com Diversity-Hiring Guidelines: Interview panels for leadership and managerial positions must include at least one certified diverse interviewer to mitigate cognitive evaluation bias. Additionally, Naukri enterprise recruitment teams actively uphold affirmative inclusion policies across gender identity, neurodiversity, and military veteran hiring.
+
+======================================================================
+--- DEMONSTRATION: OUT-OF-SCOPE FALLBACK REFUSAL ---
+Query          : What meals and beverages are provided at the company cafeteria?
+Top Similarity : 0.1956 (Threshold: 0.4198 -> REJECT)
+Grounded Flag  : False
+System Answer  : I apologize, but this topic is not covered in our recruitment policy knowledge base.
+======================================================================

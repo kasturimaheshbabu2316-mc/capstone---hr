@@ -18,6 +18,7 @@ dist/
 
 # Vector store & local databases
 chroma_data/
+chroma_db/
 *.chroma
 *.db
 *.sqlite3

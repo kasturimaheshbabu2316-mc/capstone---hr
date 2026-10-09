@@ -1,0 +1,60 @@
+======================================================================
+FASTAPI TRANSPORT & STRUCTURED AUDIT LOGGING VERIFICATION (TASKS T11 & T12)
+======================================================================
+Endpoints Tested: POST /ask, POST /add-document, WebSocket /ws/chat, GET /health
+Logging Invariant: JSON-Lines audit trail with Zero-PII Guarantee
+
+--- TEST 1: HEALTH PROBE (GET /health) ---
+Status Code: 200
+Response   : {'status': 'healthy', 'mock_llm': 'deterministic_active', 'telemetry_disabled': True, 'cache_stats': {'entries_count': 0, 'hits': 0, 'misses': 0, 'total_lookups': 0, 'hit_ratio_pct': 0.0}}
+
+--- TEST 2: HTTP POST /ask (POLICY CONSULTATION WITH PHONE PII) ---
+Request Payload : {'query': 'Candidate contact +91-9876543210 wants to know the notice period buyout policy.', 'session_id': 'sess-test-http-01'}
+Status Code     : 200
+Response Answer : According to Naukri.com Notice-Period Policy: Notice period buyout is not an employee entitlement and requires prior written approval from the department head and HR business partner.
+Source Type     : kb_policy
+Trace ID        : f0df0e29-b9f2-41ce-8a66-0b4f4daa0d74
+Review Status   : approved_unchanged
+
+--- TEST 3: HTTP POST /ask (DYNAMIC STATUS QUERY WITH ESCALATION) ---
+Request Payload : {'query': 'Check status for applicant APP-00020.', 'session_id': 'sess-test-http-02'}
+Status Code     : 200
+Response Answer : Candidate application APP-00020 is currently in 'Screening' status with an expected salary of ₹800,000. Escalation risk score is 0.4667 (Escalation Triggered: True). Application has been open for 28 days (28/30 elapsed). Escalation score 0.4667 exceeds empirical 80th percentile threshold (0.4500) -> URGENT HR ACTION REQUIRED.
+Escalation Flag : True
+Trace ID        : bef0deb4-8324-43e1-82c3-fa22e31ec1fe
+
+--- TEST 4: HTTP POST /add-document (DYNAMIC KB INGESTION) ---
+Status Code: 200
+Response   : {'message': "Document '13_relocation_allowance.md' successfully ingested into dual ChromaDB collections.", 'filename': '13_relocation_allowance.md', 'fixed_chunks_added': 2, 'sentence_chunks_added': 2}
+
+--- TEST 5: WEBSOCKET STREAMING & RESILIENT DISCONNECT RECOVERY ---
+WebSocket Client Sent : 'What is the probation period confirmation policy?'
+WebSocket Server Reply: According to Naukri.com Probation-Period Policy: A formal mid-probation review is conducted at ninety days, followed by a final confirmation assessment at five months. Additionally, If performance objectives are not met, management may either extend probation by up to three months or initiate termination with seven days notice.
+WebSocket Review Status: approved_unchanged
+
+Simulating Mid-Conversation Client Abrupt Disconnection...
+WebSocket Disconnect Caught: CLEANLY RECOVERED (No server crash, worker intact).
+Post-Disconnect Health Check: Status 200 (STABLE & HEALTHY)
+
+======================================================================
+--- TASK T12: ZERO-PII AUDIT LOG INSPECTION & REGEX GREP ---
+Audit Trail File: C:\Users\kastu\Desktop\capstone - hr\logs\audit_trail.jsonl
+Total Audit Entries Written: 5
+
+[Entry 1] Route: /ask | Status: 200 | Latency: 219.259 ms
+  Trace ID     : f0df0e29-b9f2-41ce-8a66-0b4f4daa0d74
+  Masked Prompt: Candidate contact [REDACTED_PHONE] wants to know the notice period buyout policy.
+
+[Entry 2] Route: /ask | Status: 200 | Latency: 10.325 ms
+  Trace ID     : bef0deb4-8324-43e1-82c3-fa22e31ec1fe
+  Masked Prompt: Check status for applicant APP-00020.
+
+[Entry 3] Route: /ws/chat | Status: 200 | Latency: 29.089 ms
+  Trace ID     : 3d6ebdb1-85f3-4289-957a-4b723a71c109
+  Masked Prompt: What is the probation period confirmation policy?
+
+[ZERO-PII REGEX AUDIT SCAN]
+Searching for unmasked phone numbers in C:\Users\kastu\Desktop\capstone - hr\logs\audit_trail.jsonl...
+Raw Phone Numbers Found: 0
+VERIFICATION RESULT: PASSED (Zero unmasked phone numbers touched persistent storage).
+======================================================================

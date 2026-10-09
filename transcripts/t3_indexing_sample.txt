@@ -1,0 +1,21 @@
+======================================================================
+CHROMADB DUAL CHUNKING INDEXING & RETRIEVAL SAMPLE (TASK T3)
+======================================================================
+Sample Query: 'What is the policy on notice period buyout and early release?'
+Total Chunks - Fixed Overlap: 36
+Total Chunks - Sentence Based: 36
+
+--- COLLECTION 1: kb_fixed_overlap (Top 2 Chunks) ---
+[1] Chunk ID: 05_notice_period.md_fixed_0 | Parent: 05_notice_period.md | Sim: 0.6162
+    Text: # Notice-Period Policy
+
+Confirmed full-time employees are subject to a mandatory sixty-day notice period upon submitting...
+[2] Chunk ID: 05_notice_period.md_fixed_1 | Parent: 05_notice_period.md | Sim: 0.4557
+    Text: t is not an employee entitlement and requires prior written approval from the department head and HR business partner. E...
+
+--- COLLECTION 2: kb_sentence_based (Top 2 Chunks) ---
+[1] Chunk ID: 05_notice_period.md_sent_1 | Parent: 05_notice_period.md | Sim: 0.6687
+    Text: Notice period buyout is not an employee entitlement and requires prior written approval from the department head and HR ...
+[2] Chunk ID: 05_notice_period.md_sent_2 | Parent: 05_notice_period.md | Sim: 0.4821
+    Text: Early release requests are evaluated on project handover readiness, with prorated salary deductions or company buyouts a...
+======================================================================

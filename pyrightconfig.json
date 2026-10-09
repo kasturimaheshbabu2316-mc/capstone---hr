@@ -1,0 +1,10 @@
+{
+    "pythonPath": "c:\\Users\\kastu\\Desktop\\capstone - hr\\.hr\\Scripts\\python.exe",
+    "venvPath": "c:\\Users\\kastu\\Desktop\\capstone - hr",
+    "venv": ".venv",
+    "extraPaths": [
+        "c:\\Users\\kastu\\Desktop\\capstone - hr",
+        "c:\\Users\\kastu\\Desktop\\capstone - hr\\.hr\\Lib\\site-packages",
+        "c:\\Users\\kastu\\Desktop\\capstone - hr\\.venv\\Lib\\site-packages"
+    ]
+}

@@ -1,0 +1,66 @@
+======================================================================
+APPLICATION STATUS TOOL & ESCALATION SCORING VERIFICATION (TASK T6)
+======================================================================
+Empirical 80th Percentile Escalation Cutoff (tau_esc): 0.4500
+Formula: S_esc = 0.5 * (1_flagged) + 0.5 * (days_since_created / 30.0)
+
+--- TEST CASES: SAMPLE RECORDS FROM DATASET ---
+
+[Record ID: APP-00001]
+  Status        : Applied
+  Salary (INR)  : ₹1,780,000
+  Days Open     : 7 days
+  Flagged       : False
+  Escalation Sc : 0.1167
+  Escalated?    : False
+  Reasoning     : Application has been open for 7 days (7/30 elapsed). Escalation score 0.1167 is within standard threshold (0.4500).
+
+[Record ID: APP-00002]
+  Status        : Interview Scheduled
+  Salary (INR)  : ₹440,000
+  Days Open     : 18 days
+  Flagged       : False
+  Escalation Sc : 0.3000
+  Escalated?    : False
+  Reasoning     : Application has been open for 18 days (18/30 elapsed). Escalation score 0.3000 is within standard threshold (0.4500).
+
+[Record ID: APP-00005]
+  Status        : Offered
+  Salary (INR)  : ₹1,210,000
+  Days Open     : 24 days
+  Flagged       : False
+  Escalation Sc : 0.4000
+  Escalated?    : False
+  Reasoning     : Application has been open for 24 days (24/30 elapsed). Escalation score 0.4000 is within standard threshold (0.4500).
+
+[Record ID: APP-00012]
+  Status        : Screening
+  Salary (INR)  : ₹540,000
+  Days Open     : 20 days
+  Flagged       : False
+  Escalation Sc : 0.3333
+  Escalated?    : False
+  Reasoning     : Application has been open for 20 days (20/30 elapsed). Escalation score 0.3333 is within standard threshold (0.4500).
+
+[Record ID: APP-00020]
+  Status        : Screening
+  Salary (INR)  : ₹800,000
+  Days Open     : 28 days
+  Flagged       : False
+  Escalation Sc : 0.4667
+  Escalated?    : True
+  Reasoning     : Application has been open for 28 days (28/30 elapsed). Escalation score 0.4667 exceeds empirical 80th percentile threshold (0.4500) -> URGENT HR ACTION REQUIRED.
+
+--- TEST CASES: BOUNDARY & EDGE SCENARIOS ---
+
+[Edge 1: Non-Existent Record APP-99999]
+  Status        : Not Found
+  Escalation Sc : 0.0
+  Escalated?    : False
+  Reasoning     : Application record APP-99999 does not exist in the candidate tracking system.
+
+[Edge 2 & 3: Numerical Boundaries]
+  Absolute Minimum (days=0, flagged=False)  : 0.0000 (Expected: 0.0)
+  Absolute Maximum (days=30, flagged=True) : 1.0000 (Expected: 1.0)
+  Threshold Comparison (0.4500): True
+======================================================================

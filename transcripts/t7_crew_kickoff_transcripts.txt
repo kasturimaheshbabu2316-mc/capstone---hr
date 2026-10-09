@@ -1,0 +1,22 @@
+======================================================================
+CREWAI MULTI-AGENT TEAM ORCHESTRATION (.kickoff() DEMOS - TASK T7)
+======================================================================
+Agents in System Architecture:
+  1. RetrievalAgent   (Tools: [rag_lookup])
+  2. LookupAgent      (Tools: [check_job_application_status])
+  3. ResponseComposer (Tools: [] - Least Autonomy Principle)
+Process: Sequential (.kickoff())
+
+--- RUN 1: POLICY CONSULTATION QUERY (INVOKING RAG TOOL) ---
+Input Query: 'What is the mandatory notice period and policy on notice buyout?'
+Executing policy_crew.kickoff()...
+Kickoff Result Output:
+Naukri.com recruitment policies require adherence to structured interview stages, verified credentials, and formal compensation band approvals across all talent acquisition processes.
+
+======================================================================
+--- RUN 2: APPLICANT STATUS QUERY (INVOKING STATUS LOOKUP TOOL) ---
+Input Query: 'Please check the application status and escalation risk for candidate APP-00020.'
+Executing status_crew.kickoff()...
+Kickoff Result Output:
+Candidate application APP-00012 for role 'Sales Associate' is currently in 'Screening' status with an expected salary of ₹540,000. Escalation score is 0.3333 (Escalation Triggered: False).
+======================================================================

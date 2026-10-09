@@ -1,0 +1,34 @@
+======================================================================
+PYDANTIC STRUCTURED RESPONSE VALIDATION (TASK T9)
+======================================================================
+Schema Target: crew.schemas.SupportResponse
+Fields: query_type, content, citations, escalation_flag, confidence_score
+
+--- VALIDATING SAMPLE RESPONSES ---
+
+[Sample 1: Type 'policy'] -> VALIDATION PASSED
+  Content         : Confirmed full-time employees are subject to a mandatory sixty-day notice p...
+  Citations       : ['05_notice_period.md']
+  Escalation Flag : False
+  Confidence Score: 0.95
+  JSON Serialization: {"query_type":"policy","content":"Confirmed full-time employees are subject to a mandatory...
+
+[Sample 2: Type 'status'] -> VALIDATION PASSED
+  Content         : Application APP-00020 for Sales Associate is in Screening status. Escalatio...
+  Citations       : ['JOB_APPLICATIONS']
+  Escalation Flag : True
+  Confidence Score: 1.0
+  JSON Serialization: {"query_type":"status","content":"Application APP-00020 for Sales Associate is in Screenin...
+
+[Sample 3: Type 'out_of_scope'] -> VALIDATION PASSED
+  Content         : I apologize, but this topic is not covered in our recruitment policy knowle...
+  Citations       : []
+  Escalation Flag : False
+  Confidence Score: 0.0
+  JSON Serialization: {"query_type":"out_of_scope","content":"I apologize, but this topic is not covered in our ...
+
+--- TESTING INVALID SCHEMA REJECTION (NEGATIVE TEST) ---
+Negative Test Passed: Pydantic correctly rejected invalid fields:
+  - Field 'query_type': Input should be 'policy', 'status' or 'out_of_scope'
+  - Field 'confidence_score': Input should be less than or equal to 1
+======================================================================
